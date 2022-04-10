@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
+    <title>SPSA Chat Application</title>
+    <link rel="stylesheet" href="css/main.css"/>
+</head>
+<body>
+<noscript>
+    <h2>Sorry! Your browser doesn't support Javascript</h2>
+</noscript>
+
+<div id="firstBlock">
+    <div class="username-page-container">
+        <form id="usernameForm" name="usernameForm" onsubmit="return false;">
+            <div class="form-group">
+                <h2>Create chat</h2>
+                <label for="firstUserId"></label>
+                <input type="text" id="firstUserId" placeholder="First id" autocomplete="off" class="form-control"/>
+                <label for="secondUserId"></label>
+                <input type="text" id="secondUserId" placeholder="Second id" autocomplete="off" class="form-control"/>
+            </div>
+            <div class="form-group">
+                <button type="submit" class="accent chat-creation" onclick="createChat()">Create Chat</button>
+            </div>
+            <div class="form-group">
+                <h2>Connect to chat</h2>
+                <label for="chatId"></label>
+                <input type="text" id="chatId" placeholder="Select chat id"/>
+                <label for="userId"></label>
+                <input type="text" id="userId" placeholder="Select user id"/>
+            </div>
+            <div class="form-group">
+                <button type="submit" class="accent chat-submit" onclick="connect()">Start Chatting</button>
+            </div>
+        </form>
+    </div>
+</div>
+<div id="chat-page" class="hidden">
+    <div class="chat-container">
+        <div class="chat-header">
+            <h2>SPSA chat</h2>
+        </div>
+        <div class="connecting">
+            Connecting...
+        </div>
+        <ul id="messageArea"></ul>
+        <form id="messageForm" name="messageForm" onsubmit="return false;">
+            <div class="form-group">
+                <div class="input-group clearfix">
+                    <input type="text" id="message" placeholder="Type a message..." autocomplete="off"
+                           class="form-control"/>
+                    <button type="submit" class="primary" onclick="sendMessage()">Send</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.4.0/sockjs.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+<script src="./js/main.js"></script>
+</body>
+</html>

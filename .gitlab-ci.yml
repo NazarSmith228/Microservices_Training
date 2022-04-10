@@ -1,0 +1,75 @@
+cache:
+  paths:
+    - maven.repository/
+    - front-end-module/node_modules
+
+stages:
+  - build
+  - test
+  - deploy
+
+front-end-deploy:
+  stage: build
+  image: ruby:latest
+  script:
+    - cd front-end-module
+    - apt-get update -qy
+    - curl -sL https://deb.nodesource.com/setup_12.x | bash -
+    - apt install nodejs
+    - npm install express --save
+    - gem install dpl
+    - rm -rf .git
+    - sed -i 's/ng serve/node server.js/g' package.json
+    - sed -i 's/_comment/postinstall/g' package.json
+    - git init
+    - echo node_modules >> .gitignore
+    - git config --global user.email "user@user.com"
+    - git config --global user.name "user@user.com"
+    - git add .
+    - git commit -m "Deploy FE"
+    - dpl --provider=heroku --app=epam-front-end-app --api-key=$HEROKU_KEY --strategy=git
+  only:
+    - release/v2
+
+back-end-build:
+  image: maven:3.5.0-jdk-8
+  stage: build
+  script:
+    - mvn -f eureka-module/pom.xml package -B
+    - mvn -f mail-module/pom.xml package -B
+    - mvn -f slsa-module/pom.xml package -B
+    - mvn -f spsa-module/pom.xml package -B
+
+back-end-test:
+  image: maven:3.5.0-jdk-8
+  stage: test
+  script:
+    - mvn -f slsa-module/pom.xml verify -B
+    - mvn -f spsa-module/pom.xml verify -B
+    - cat slsa-module/target/site/jacoco/index.html | grep -o 'Total[^%]*%' | sed -e 's/Total/Jacoco-Test-Coverage:/g'
+    - cat spsa-module/target/site/jacoco/index.html | grep -o 'Total[^%]*%' | sed -e 's/Total/Jacoco-Test-Coverage:/g'
+  artifacts:
+    reports:
+      junit:
+        - slsa-module/target/surefire-reports/TEST-*.xml
+        - spsa-module/target/surefire-reports/TEST-*.xml
+    paths:
+      - ./.jar
+
+back-end-deploy:
+  image: ruby:latest
+  stage: deploy
+  script:
+    - apt-get update -qy
+    - apt-get install -y ruby-dev
+    - gem install dpl
+    - cd eureka-module
+    - dpl --provider=heroku --app=epam-eureka-server --api-key=$HEROKU_KEY
+    - cd ../mail-module
+    - dpl --provider=heroku --app=epam-mail-server --api-key=$HEROKU_KEY
+    - cd ../slsa-module
+    - dpl --provider=heroku --app=epam-slsa-app --api-key=$HEROKU_KEY
+    - cd ../spsa-module
+    - dpl --provider=heroku --app=epam-spsa-app --api-key=$HEROKU_KEY
+  only:
+    - release/v2

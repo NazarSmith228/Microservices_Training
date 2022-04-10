@@ -1,0 +1,18 @@
+spring:
+  mail:
+    host: smtp.gmail.com
+    username: epmrduasp@gmail.com
+    password: epmrduasp12345
+    port: 587
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+eureka:
+  instance:
+    instance-id: mail-server
+
+server:
+  port: 8084

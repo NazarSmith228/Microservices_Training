@@ -1,0 +1,6 @@
+eureka:
+  instance:
+    hostname: ${DOMAIN_NAME}
+  client:
+    serviceUrl:
+      defaultZone: ${EUREKA_PATH}/eureka/
